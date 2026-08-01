@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+flask-swagger
+flask-swagger-ui
+gunicorn
+marshmallow
+marshmallow-sqlalchemy
+psycopg2-binary
+python-jose
