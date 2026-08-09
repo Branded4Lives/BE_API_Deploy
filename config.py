@@ -46,3 +46,6 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = normalize_database_url(os.getenv("DATABASE_URL"))
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    SWAGGER_HOST = os.getenv("SWAGGER_HOST") or os.getenv("RENDER_EXTERNAL_HOSTNAME")
+    SWAGGER_SCHEME = os.getenv("SWAGGER_SCHEME") or "https"

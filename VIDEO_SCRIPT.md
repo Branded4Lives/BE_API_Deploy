@@ -1,51 +1,68 @@
 # Video Presentation Script
 
-Target length: 3 to 4 minutes. The assignment requires the video to stay under 5 minutes. Make sure your face is visible on camera while presenting.
+Target length: 3 to 4 minutes. The video must stay under 5 minutes, and your face must be visible on camera while you present.
+
+Before recording, have these ready:
+
+- Deployed API URL: `https://YOUR-SERVICE.onrender.com`
+- Swagger docs URL: `https://YOUR-SERVICE.onrender.com/docs`
+- GitHub repository URL: `https://github.com/YOUR-USERNAME/YOUR-REPO`
+- GitHub Actions page open to the latest passing workflow run
 
 ## 1. Introduction
 
-Hi, my name is Brandon, and this is my Mechanic Shop API Deployment project.
+Hi, my name is Brandon, and this is my API Deployment and CI/CD Pipeline project.
 
-This project is a Flask backend API for a mechanic shop. It includes customers, mechanics, inventory, and service tickets, plus Swagger documentation, automated unittest coverage, Render deployment configuration, and a GitHub Actions CI/CD pipeline.
+This project is a Flask backend API for a mechanic shop. It helps manage customers, mechanics, inventory parts, and service tickets. The final version is deployed on Render, uses a hosted PostgreSQL database, includes Swagger documentation, and has a GitHub Actions pipeline for testing and deployment.
 
 ## 2. What The Project Does
 
-The API manages the core data for a mechanic shop.
+The API handles the main workflow for a mechanic shop.
 
-Customers and mechanics can be created and logged in. Mechanics can manage inventory parts and service tickets. Service tickets can be assigned to mechanics, have mechanics removed, and have inventory parts attached.
+Customers and mechanics can create accounts and log in. Mechanics can manage inventory parts, create service tickets, assign mechanics to those tickets, remove mechanics from tickets, and attach parts to tickets. Customers can also view their own service tickets through a protected route.
 
 ## 3. How It Works
 
-The project uses Flask with the application factory pattern. Each major resource has its own blueprint folder with routes and Marshmallow schemas.
+At a high level, the project uses Flask with the application factory pattern. The app is organized into blueprints for customers, mechanics, inventory, service tickets, and documentation.
 
-The app uses SQLAlchemy for the database. Locally it can run with SQLite, and in production it reads the Render PostgreSQL connection string from the `DATABASE_URL` environment variable.
+The database layer uses SQLAlchemy. For local development, the app can use SQLite. In production, it uses the hosted Render PostgreSQL database through the `DATABASE_URL` environment variable.
 
-The production entrypoint is `flask_app.py`, and Render starts it with `gunicorn flask_app:app`. Sensitive values like the database URL and secret key are stored as environment variables.
+Sensitive settings are kept out of the code. The database URI and secret key are stored in environment variables, and the app reads them with Python's `os` package. The local `.env` file is listed in `.gitignore`, so those values are not pushed to GitHub.
+
+For deployment, the old local app entrypoint was replaced with `flask_app.py`. That file imports `ProductionConfig` and passes it into `create_app`. Render starts the production app with:
+
+```text
+gunicorn flask_app:app
+```
+
+The deployment dependencies are frozen in `requirements.txt`, including `gunicorn` and `psycopg2`. I installed `python-dotenv` during setup, but removed it from `requirements.txt` after freezing, following the deployment instructions.
+
+The production config also sets Swagger for the deployed API by using the live Render host and `https` as the scheme.
 
 ## 4. Quick Demo
 
-First, I will open the deployed Render URL and show that the API responds.
+First, I will open the deployed Render URL and show the root API response. This confirms the web service is live.
 
-Next, I will open `/docs` to show the Swagger UI. The docs show route categories, request bodies, response examples, and bearer-token security for protected routes.
+Next, I will open `/docs` to show the Swagger UI. The Swagger docs show the available endpoints, request bodies, response examples, and bearer-token security for protected routes.
 
-Then I will demonstrate a simple workflow: create a customer, create a mechanic, log in as the mechanic, create an inventory part, create a service ticket, and assign a mechanic to that ticket.
+Then I will demonstrate a short API workflow in Swagger: create a mechanic, log in as that mechanic, create an inventory part, create a service ticket, and assign the mechanic to that ticket.
 
-I will also show the unittest command:
+I will also briefly show the GitHub repository and the project files that support deployment: `requirements.txt`, `config.py`, `flask_app.py`, and `.github/workflows/main.yaml`.
+
+## 5. CI/CD Pipeline
+
+The CI/CD workflow lives in `.github/workflows/main.yaml`.
+
+The workflow runs when code is pushed to `main`, when a pull request targets `main`, or when I manually start it from GitHub Actions.
+
+The pipeline has separate build, test, and deploy jobs. The build job installs dependencies and compiles the app. The test job runs:
 
 ```text
 python -m unittest discover tests
 ```
 
-The tests cover every route and include negative tests like duplicate emails, invalid login, missing tokens, and missing resources.
-
-## 5. CI/CD
-
-The GitHub Actions workflow is in `.github/workflows/main.yaml`.
-
-It installs dependencies and runs the unittest suite first. The deploy job depends on the test job, so Render deployment only triggers after tests pass.
-
-The Render service ID and API key are stored as GitHub repository secrets.
+The deploy job depends on the test job with `needs: test`, so Render deployment only runs after the tests pass. The Render service ID and Render API key are stored securely as GitHub repository secrets, not in the code.
 
 ## 6. Closing
 
-That completes my API Deployment and CI/CD Pipeline project. The repository includes the production config, Render setup instructions, Swagger documentation, automated tests, and the CI/CD workflow.
+That completes my API Deployment and CI/CD Pipeline project. The final submission includes the deployed Render service URL, the GitHub repository URL, and this video uploaded directly to Disco.

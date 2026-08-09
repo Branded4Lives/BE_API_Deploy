@@ -15,6 +15,8 @@ def create_app(config_class=DevelopmentConfig):
 
     if not app.config.get("SQLALCHEMY_DATABASE_URI"):
         raise RuntimeError("DATABASE_URL must be set for this environment.")
+    if not app.config.get("SECRET_KEY"):
+        raise RuntimeError("SECRET_KEY must be set for this environment.")
 
     db.init_app(app)
 

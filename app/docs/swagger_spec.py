@@ -36,8 +36,12 @@ def response(description, definition_name=None, example=None):
 
 
 def build_swagger_spec(base_spec, app=None):
-    host = app.config.get("SWAGGER_HOST", "127.0.0.1:5000") if app else "127.0.0.1:5000"
-    scheme = app.config.get("SWAGGER_SCHEME", "http") if app else "http"
+    if app:
+        host = app.config.get("SWAGGER_HOST") or "127.0.0.1:5000"
+        scheme = app.config.get("SWAGGER_SCHEME") or "http"
+    else:
+        host = "127.0.0.1:5000"
+        scheme = "http"
 
     base_spec.update(
         {
